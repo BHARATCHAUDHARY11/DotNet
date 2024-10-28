@@ -45,3 +45,4 @@ jobs:
           } else {
               Write-Output "Output directory does not exist: $outputDir"
               exit 1
+          }
