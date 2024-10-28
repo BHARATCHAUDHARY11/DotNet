@@ -46,3 +46,6 @@ jobs:
               Write-Output "Output directory does not exist: $outputDir"
               exit 1
           }
+    # Publish the application
+      - name: Publish the application
+        run: msbuild ASPDotNetSampleWebapp.sln /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=FolderProfile /p:PublishDir="ASPDotNetSampleWebapp/bin/Release/publish/"
