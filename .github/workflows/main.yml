@@ -3,7 +3,7 @@ name: Build and Deploy ASP.NET 4.8 Application
 on:
   push:
     branches:
-      - master 
+      - master
 
 jobs:
   build:
@@ -44,5 +44,4 @@ jobs:
               Get-ChildItem $outputDir
           } else {
               Write-Output "Output directory does not exist: $outputDir"
-              exit 1
-          }
+              exit 1
