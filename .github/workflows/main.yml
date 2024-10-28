@@ -10,39 +10,39 @@ jobs:
     runs-on: windows-latest  # ASP.NET 4.8 requires Windows environment
 
     steps:
-   # Ensure the release directory exists
-    - name: Ensure Release Directory Exists
-      run: |
-        $releaseDir = "D:\a\DotNet\DotNet\release"
-        if (!(Test-Path -Path $releaseDir)) {
-            New-Item -ItemType Directory -Path $releaseDir
-            echo "Release directory created at $releaseDir."
-        } else {
-            echo "Release directory already exists at $releaseDir."
-        }
-    - name: Checkout code
-      uses: actions/checkout@v2
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1
+      # Setup MSBuild
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
 
-    - name: Restore NuGet packages
-      run: nuget restore ASPDotNetSampleWebapp.sln
+      # Restore NuGet packages
+      - name: Restore NuGet packages
+        run: nuget restore ASPDotNetSampleWebapp.sln
 
-    - name: Build the solution
-      run: msbuild ASPDotNetSampleWebapp.sln /p:Configuration=Release
-    
-   
+      # Build the solution with detailed logging
+      - name: Build the solution
+        run: msbuild ASPDotNetSampleWebapp.sln /p:Configuration=Release /p:OutputPath="bin\Release" /v:detailed
 
-    # Publish the project
-    - name: Publish the project
-      run: |
-        mkdir publish
-        xcopy /s /e /y /i "D:\a\DotNet\DotNet\ASPDotNetSampleWebapp\bin\ASPDotNetSampleWebapp\*" "publish"
+      # List all files in workspace to debug output location
+      - name: List all files in workspace
+        shell: pwsh
+        run: |
+          $workspace = "${{ github.workspace }}"
+          Write-Output "Listing all files in workspace for debugging:"
+          Get-ChildItem -Path $workspace -Recurse
 
-    # Upload Build Artifact
-    - name: Upload Build Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: aspnet_app
-        path: publish
+      # Check if the output directory exists
+      - name: Check Output Directory
+        shell: pwsh
+        run: |
+          $outputDir = Join-Path -Path "${{ github.workspace }}" -ChildPath "ASPDotNetSampleWebapp/bin/Release"
+          if (Test-Path $outputDir) {
+              Write-Output "Output directory exists: $outputDir"
+              Get-ChildItem $outputDir
+          } else {
+              Write-Output "Output directory does not exist: $outputDir"
+              exit 1
+          }
