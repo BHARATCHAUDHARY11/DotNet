@@ -10,30 +10,39 @@ jobs:
     runs-on: windows-latest  # ASP.NET 4.8 requires Windows environment
 
     steps:
-      # Checkout the code
-      - name: Checkout code
-        uses: actions/checkout@v2
+   # Ensure the release directory exists
+    - name: Ensure Release Directory Exists
+      run: |
+        $releaseDir = "D:\a\DotNet\DotNet\release"
+        if (!(Test-Path -Path $releaseDir)) {
+            New-Item -ItemType Directory -Path $releaseDir
+            echo "Release directory created at $releaseDir."
+        } else {
+            echo "Release directory already exists at $releaseDir."
+        }
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      # Setup MSBuild
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
 
-      # Restore NuGet packages
-      - name: Restore NuGet packages
-        run: nuget restore ASPDotNetSampleWebapp.sln
+    - name: Restore NuGet packages
+      run: nuget restore ASPDotNetSampleWebapp.sln
 
-      # Build the solution with detailed logging
-      - name: Build the solution
-        run: msbuild ASPDotNetSampleWebapp.sln /p:Configuration=Release /v:detailed
+    - name: Build the solution
+      run: msbuild ASPDotNetSampleWebapp.sln /p:Configuration=Release
+    
+   
 
-      # Check if the output directory exists
-      - name: Check Output Directory
-        run: |
-          $outputDir = "D:\a\DotNet\DotNet\ASPDotNetSampleWebapp\bin\Release"
-          if (Test-Path $outputDir) {
-              echo "Output directory exists: $outputDir"
-              Get-ChildItem $outputDir
-          } else {
-              echo "Output directory does not exist: $outputDir"
-              exit 1
-          }
+    # Publish the project
+    - name: Publish the project
+      run: |
+        mkdir publish
+        xcopy /s /e /y /i "D:\a\DotNet\DotNet\ASPDotNetSampleWebapp\bin\ASPDotNetSampleWebapp\*" "publish"
+
+    # Upload Build Artifact
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: aspnet_app
+        path: publish
