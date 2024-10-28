@@ -49,3 +49,4 @@ jobs:
     # Publish the application
       - name: Publish the application
         run: msbuild ASPDotNetSampleWebapp.sln /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=FolderProfile /p:PublishDir="ASPDotNetSampleWebapp/bin/Release/publish/"
+
