@@ -3,7 +3,7 @@ name: Build and Deploy ASP.NET 4.8 Application
 on:
   push:
     branches:
-      - master  
+      - master 
 
 jobs:
   build:
